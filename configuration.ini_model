@@ -1,6 +1,6 @@
 [debug]
 # log different messages to disk (applies all started .py processes)
-debugLogging = True
+debugLogging = False
 
 [main]
 # counter lines
