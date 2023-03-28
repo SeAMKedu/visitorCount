@@ -51,7 +51,8 @@ Sovellus käyttää suojaamatonta yhteyttä MQTT brokerin ja skriptien ja toisaa
 Sovellus ei talleta kuvia tai videota, mutta se mahdollistaa kerran sekunnissa päivittyvän live-kuvan seuraamisen web-käyttöliittymän kautta. Tätä käyttöliittymää ei ole tarkoitus käyttää kuin asennusvaiheessa kameran oikean suuntaamisen varmistamiseksi.
 ## Kävijälaskurin toiminta
 Kävijälaskurin toiminta perustuu modulaariseen sovellusrakenteeseen, joka koostuu viidestä päämoduulista:
-- Tunnistusmoduuli [vehicle_count.py](vehicle_count.py)
+- Tunnistusmoduuli [yoloCount.py](yoloCount.py) 
+- edelliselle vaihtoehtoinen kasvojen tunnistamiseen pohjautuva [faceCount.py](faceCount.py)
 - Dataa levylle tallettava [listener.py](listener.py)
 - Tilastot muotoileva [parse_stats.py](parse_stats.py)
 - Raportit sähköpostiin lähettävä [emailing.py](emailing.py)
@@ -65,7 +66,7 @@ Näiden lisäksi on apumoduuleja, joihin on pakattu tarvittavia funktioita ja lu
 - OpenCV piirtofunktiot kameran ottamille kuville suorittava [drawing_functions.py](drawing_functions.py)
 
 ## Tunnistusmoduuli vehicle_count.py
-Vehicle_count.py nojaa OpenCV-kirjaston Darknet-neuroverkkoalustalle rakennettuun, valmiiksi koulutettuun [YoloV4-verkkoon](https://paperswithcode.com/method/yolov4), GitHubissa [https://github.com/pjreddie/darknet](https://github.com/pjreddie/darknet). Kehittelyn pohjaksi otettiin [TechVidvanin](https://techvidvan.com/tutorials/opencv-vehicle-detection-classification-counting/) mallikoodi. Skripti alustaa neuroverkon valmiilla YOLOv4-lite (tai raskaammalla YOLOv4) koulutustiedostolla [https://github.com/AlexeyAB/darknet/tree/master/cfg](https://github.com/AlexeyAB/darknet/tree/master/cfg), joka tunnistaa COCO-aineiston 80 erilaista objektia. Tämän pilotin kannalta oleellisia ovat ihmiset, mutta skriptiin on helppo valita haluamansa seurattavat objektit mukauttamalla asetustiedoston `required_classes`-listaa.
+yoloCount.py nojaa OpenCV-kirjaston Darknet-neuroverkkoalustalle rakennettuun, valmiiksi koulutettuun [YoloV4-verkkoon](https://paperswithcode.com/method/yolov4), GitHubissa [https://github.com/pjreddie/darknet](https://github.com/pjreddie/darknet). Kehittelyn pohjaksi otettiin [TechVidvanin](https://techvidvan.com/tutorials/opencv-vehicle-detection-classification-counting/) mallikoodi. Skripti alustaa neuroverkon valmiilla YOLOv4-lite (tai raskaammalla YOLOv4) koulutustiedostolla [https://github.com/AlexeyAB/darknet/tree/master/cfg](https://github.com/AlexeyAB/darknet/tree/master/cfg), joka tunnistaa COCO-aineiston 80 erilaista objektia. Tämän pilotin kannalta oleellisia ovat ihmiset, mutta skriptiin on helppo valita haluamansa seurattavat objektit mukauttamalla asetustiedoston `required_classes`-listaa.
 
 Skriptissä on kirjoitushetkellä sisäänrakennettuna mahdollisuus sekä paikallisen käyttöjärjestelmän ikkunaan että web-palvelimelle käyttöliittymän tuottavaan ajoon (boolean-muuttujat `setup_local_screen` ja `web_screen`). Nämä eivät kuitenkaan ole pakollisia itse toiminnan kannalta. Video-kuvaa voi välittää myös MQTT-brokerille `/pic` aihekanavalle asetustiedoston `setupMqttVideo` boolean-muuttujan avulla, joskin etenkin pilvessä toimivat maksuttomat MQTT-brokerit eivät yleensä salli merkittävien data-määrien siirtämistä pitkää aikaa. Paikallisella MQTT-brokerilla kuten [Mosquitto](https://mosquitto.org/) ongelma on pienempi.
 
