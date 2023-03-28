@@ -9,6 +9,7 @@ Merkittävät muutokset julkaisuun
 |---|---|---|
 |15.2.2023|1. julkaisu|Tommi Ylimäki|
 |13.3.2023|Mosquitto ja systemctl|Tommi Ylimäki|
+|28.3.2023|julkaisu SeAMKedussa|Tommi Ylimäki|
 # Sisällysluettelo
 - [Julkaisun nimi](#julkaisun-nimi)
 - [Julkaisun historiatiedot](#julkaisun-historiatiedot)
