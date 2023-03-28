@@ -13,7 +13,7 @@ camera_rotate = 0
 resolution = (1280,720)
 # True crops camera picture into square form
 crop_square = False
-
+#
 # local CV2 window to show video stream 
 setup_local_screen = False
 # which camera to use (0 is the first attached camera, eg. integrated web camera or first usb camera)
