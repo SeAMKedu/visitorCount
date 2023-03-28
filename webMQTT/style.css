@@ -1,0 +1,89 @@
+body {
+    font-family: "Open Sans", sans-serif;
+    color:#eee;
+    background-color:#303030;
+}
+.container {
+    margin:10px 0px;
+    display:block;
+}
+.wrapper {
+    margin-left: auto;
+    margin-right: auto;
+    width: 70%;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+.info {
+    padding: 12px 12px;
+    margin:5px;
+    background-color:#666;
+}
+input {
+    border: none;
+    background-color:#666;
+    padding:5px;
+    margin:3px 1px;
+    color:azure;
+    min-width:100px;
+    width:30%;
+}
+input[type=text] {
+
+}
+input[type=password] {
+
+}
+input[type=button] {
+    background-color:lightgreen;
+    border: none;
+    color:darkgreen;
+    border-radius:5px;
+    text-decoration: none;
+    font-weight: bold;
+    height: 2em;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+input[type=text]:focus, input[type=text]:focus-visible {
+    background-color: rgb(213, 255, 224);
+    color:darkgreen;
+    border-color:chartreuse;
+}
+input[type=button]:hover {
+    background-color:chartreuse;
+
+}
+
+#Main_heading{
+     text-align: center;
+}
+
+#messages {
+    margin-top: 12px;
+    margin-bottom: 12px;
+    padding: 12px;
+    width:100%;
+    display: inline-block;
+    border: none;
+    background-color:#666;
+    max-height: 250px;
+    min-height: 250px;
+    overflow: scroll;
+}
+#messages span {
+    overflow-y: scroll;
+    overflow: scroll;
+}
+#image {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 5px;
+    display: inline-block;
+    border:1px solid black;
+    width:100%;
+    max-width:500px;
+    
+}

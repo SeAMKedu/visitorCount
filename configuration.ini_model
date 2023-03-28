@@ -1,0 +1,102 @@
+[debug]
+# log different messages to disk (applies all started .py processes)
+debugLogging = True
+
+[main]
+# counter lines
+direction = vertical
+middle_line = 0.5
+line_difference = 0.125
+# Camera rotate, 0 = 0 deg, 1 = 90deg clockwise, 2 = 180deg, 3 = 90deg counterClockwise                                                                                                                        camera_rotate = 3    
+camera_rotate = 0
+# native resolution of camera
+resolution = (1280,720)
+# True crops camera picture into square form
+crop_square = False
+
+# local CV2 window to show video stream 
+setup_local_screen = False
+# which camera to use (0 is the first attached camera, eg. integrated web camera or first usb camera)
+camera_number = 0
+# are those frames saved to disk that contain some detections
+save_detection_frames = False
+
+# Detection confidence threshold
+confThreshold = 0.45
+nmsThreshold = 0.2
+# False uses yolov4, True yolov4-tiny network
+model_tiny = True 
+# Shall we show tracked objects' tracers
+tracers = True
+# Shall we show dividing lines used to determine direction of motion
+lines = True 
+# Shall we show stats box
+show_stats = False 
+required_classes = ["person", "car","bicycle","truck", "cup"]
+directions = ["Sisaan", "Ulos"]
+
+## Tracker settings
+model_spec = {'order_pos': 1, 'dim_pos': 2,\
+            'order_size': 0, 'dim_size': 2,\
+            'q_var_pos': 5000., 'r_var_pos': 0.1}
+matching_fn_kwargs={'min_iou': 0.25, 'multi_match_min_iou': 0.93}
+active_tracks_kwargs={'min_steps_alive': 2, 'max_staleness': 25}
+tracker_kwargs={'max_staleness': 30}
+# Guess FPS rate for dt parameter computation (dt = 1/FPS) 
+FPSforDt = 8
+
+[web]
+## Vehicle count web server settings
+# True activates the web server (localhost:port)
+web_server = True
+port = 5000
+# Show video stream (to be done)
+web_video_stream = False
+
+[email]
+sender_email = sender@live.com
+receiver_email = receiver@live.com
+smtp = smtp-mail.outlook.com
+password = passwd
+user = yourAccount@live.com
+port = 587
+subjects = ["Daily Visitor report", "Weekly Visitor report", "Monthly Visitor report"]
+
+[mqtt]
+port = 1883
+ssl = False
+#token = FlespiToken abcdefghijklmn (given in flespi.io), if you are using this cloud service provider.
+webSocket = False
+token = "" can be empty, for example if operated on local MQTT broker that allows anonymous logging.
+brokerAddress = IPADDRESS (xxx.xxx.xxx.xxx)
+clean_session = False
+
+## Vehicle count MQTT settings
+detectionPublishers = ['Kamera1']
+listener = VehicleCount_Subscriber2
+# mqtt video stream
+setupMqttVideo = True
+mqttVideoResolution = 500
+# mqtt stats
+publishMqttStats = True
+# time in seconds between frames published with mqtt
+mqttVideoInterval = 1.0
+
+## parse_stats MQTT settings
+reportParserPublishers = ["dailyStats_Publisher", "weeklyStats_Publisher", "monthlyStats_Publisher"]
+statsTopics = ["dailyStats", "weeklyStats", "monthlyStats"]
+
+[parseStats]
+parseStatsConditionDict = {"daily":"now.hour == 1 and now.minute == 0 and now.second < 60",\
+    "weekly":"now.isocalendar()[2] == 2 and now.hour == 2 and now.minute == 0 and now.second < 60",\
+    "monthly":"now.day == 1 and now.hour == 3 and now.minute == 0 and now.second < 60"}
+      
+[files]
+raw_log = raw_log.csv
+data_log = data_log.csv
+writeCSVtoDiskDelay = 3600
+
+[language]
+language = suomi
+
+

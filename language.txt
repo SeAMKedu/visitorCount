@@ -1,0 +1,42 @@
+[parse_stats]
+languageString = {"English":\
+            {"report info":"report info", \
+            "statsPollStartTime":"statsPollStartTime", \
+            "statsCurrentTime":"statsCurrentTime",\
+            "statsCountFromStart":"statsCountFromStart",\
+            "statsType":"statsType",\
+            "reportSpan":"report time span",\
+            "daily":"daily",\
+            "weekly":"weekly",\
+            "monthly":"monthly",\
+            "total":"total",\
+            "time span":["hour", "day of week", "day of month"],\
+            "direction":"direction",\
+            "from_areas":"from_areas",\
+            "publishers":"publishers",\
+            "types":"types",\
+            "amount":"amount",\
+            "person":"person",\
+            "car":"car",\
+            "face":"face"},\
+            
+            "suomi":\
+            {"report info":"tietoa raportista", \
+            "statsPollStartTime":"tilastoinnin käynnistysaika", \
+            "statsCurrentTime":"tämän tilaston luontiaika",\
+            "statsCountFromStart":"tilaston järjestysnumero",\
+            "statsType":"tilaston tyyppi",\
+            "daily":"päivätilasto",\
+            "weekly":"viikkotilasto",\
+            "monthly":"kuukausitilasto",\
+            "reportSpan":"raportin aikaväli",\
+            "total":"yhteensä",\
+            "direction":"suunta",\
+            "from_areas":"suunnat",\
+            "publishers":"julkaisijat",\
+            "types":"seuratut",\
+            "amount":"lukumäärä",\
+            "time span":["tunti", "viikon päivä", "kuukauden päivä"],\
+            "person":"henkilö",\
+            "car":"auto",\
+            "face":"kasvot"}}
