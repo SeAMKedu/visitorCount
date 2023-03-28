@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7777451.svg)](https://doi.org/10.5281/zenodo.7777451)
+
 ![Älykkäät teknologiat](https://storage.googleapis.com/seamk-production/2022/04/2b1d63e0-alykkaat-teknologiat_highres_2022-768x336.jpg)
 ![ESR](https://storage.googleapis.com/seamk-production/2022/02/da4e4541-eu-lippu-290x300.png) ![Vipuvoimaa](https://storage.googleapis.com/seamk-production/2022/02/8d432b35-vipuvoimaa-eulta-logo-300x212.png) ![ELY-keskus](https://storage.googleapis.com/seamk-production/2021/08/5e942eac-ely-keskus_logo-300x105.png) ![SeAMK](https://storage.googleapis.com/seamk-production/2022/02/79a4ce1b-seamk_vaaka_fi_en_rgb_1200x486-300x122.jpg)
 # Kävijäseuranta ja raportointi
@@ -25,6 +27,7 @@ Merkittävät muutokset julkaisuun
 - [Tulokset](#tulokset)
 - [Lisenssi](#lisenssi)
 - [Tekijät](#tekijät)
+- 
 
 # Teknologiapilotti
 TehoData-hankkeen pilotissa 10 pyrittiin luomaan edullinen kävijälaskuri pienille matkailualan yrityksille Etelä-Pohjanmaalla. Julkaisu löytyy osoitteesta [https://lehti.seamk.fi/alykkaat-ja-energiatehokkaat-jarjestelmat/tekoaly-tuo-tarkkuutta-matkailuyrityksen-kavijadataan/](https://lehti.seamk.fi/alykkaat-ja-energiatehokkaat-jarjestelmat/tekoaly-tuo-tarkkuutta-matkailuyrityksen-kavijadataan/).
