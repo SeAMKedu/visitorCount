@@ -1,5 +1,5 @@
 #!/bin/bash
-python3 vehicle_count.py >> ./logs/vehicle_count.log&
+python3 yoloCount.py >> ./logs/yoloCount.log&
 . venv38/bin/activate
 python listener.py $1 >> ./logs/listener.log&
 python emailing.py >> ./logs/emailing.log&
