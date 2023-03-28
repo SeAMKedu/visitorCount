@@ -1,4 +1,4 @@
-# Import necessary packages"
+# Import necessary packages
 import base64
 from mqtt_class import mqttClass
 from drawing_functions import *
