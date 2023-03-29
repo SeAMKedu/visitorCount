@@ -42,8 +42,8 @@ TehoDatan hankesivut löytyvät osoitteesta [https://projektit.seamk.fi/alykkaat
 # Tavoitteet
 Pilotissa kehitettiin edullista, avoimen lähdekoodin kuvantunnistusalgoritmien toimintaan perustuvaa kävijälaskuria.
 # Toimenpiteet
-Sovelluskokonaisuuden toimintaa on testattu pilottiyrityksessä kesällä 2023, minkä pohjalta määriteltiin jatkokehitystarpeet:
--sovellus on saatava toimimaan nopeammin (esimerkiksi Raspberry Pi 4:llä tai ainakin Jetson Nanolla)
+Sovelluskokonaisuuden toimintaa on testattu pilottiyrityksessä loppukesästä 2022, minkä pohjalta määriteltiin jatkokehitystarpeet:
+-sovellus on saatava toimimaan nopeammin (tavoitteena sujuvuus Raspberry Pi 4:llä tai ainakin Jetson Nanolla)
 -sovellukseen vaihdettiin paremmin toimiva kohteenseuranta-algoritmi
 -sovellus on pilkottiin modulaarisiin osiin, jotta esimerkiksi tulo- ja lähtötapahtumien tunnistamiseen käytetty teknologia voidaan haluttaessa vaihtaa
 
