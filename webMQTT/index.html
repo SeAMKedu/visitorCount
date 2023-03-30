@@ -26,9 +26,9 @@
 
          </div>
          <form class="container" id="connection-form">
-            <input id="host" type="text" name="host" value ="localhost" placeholder="broker address">
+            <input id="host" type="text" name="host" value = "{{host}}" placeholder="broker address">
             <input id="port" type="text" name="port" value="8080", placeholder="broker port (8080)">
-            <input id="topic_s" type="text" name="topic_s" placeholder="topic eg. #">
+            <input id="topic_s" type="text" name="topic_s", value = "#" placeholder="topic eg. #">
             <input id="username" type="text" name="Username" placeholder="Username">
             <input id="password" type="password" name="password" placeholder="password">
             <input id="connectbtn" type="button" style="display:inline" onclick="startConnect()"  value="Connect">
