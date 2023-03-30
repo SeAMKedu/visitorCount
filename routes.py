@@ -17,7 +17,8 @@ app = Flask(__name__, template_folder = template_dir, static_folder = static_dir
 @app.route('/')
 def index_page():
     """Video streaming home page."""
-    return render_template('index.html')
+    host = request.headers.get('Host').split(":")[0]
+    return render_template('index.html', host=host)
     #return 'web app with python flask!'
 
 def main():
