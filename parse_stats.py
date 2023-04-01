@@ -130,18 +130,19 @@ class parseDataToJSON():
                                 dataTable[typeIDlang][timeRange][from_to] += 1 # next appearance of such typeID
                                 dataTable[totalLang][typeIDlang][from_to] += 1
             # sort time slots into ascending order (in case they were not sorted in data csv)
+            keys = {}
             for typeID in dataTable:
                 #if typeID != self.words[self.language]["report info"]:
                 if typeID in dataTable[infoLang][typesLang]:
-                
-                    keys = sorted(dataTable[typeID].keys(), key=avoidHeader)
+                    keys[typeID] = sorted(dataTable[typeID].keys(), key=avoidHeader)
             dataTableFinal = {infoLang:dataTable[infoLang], totalLang:dataTable[totalLang]}
             for typeID in dataTable:
                 #if typeID != self.words[self.language]["report info"]:
                 if typeID in dataTable[infoLang][typesLang]:
                     if typeID not in dataTableFinal:
                         dataTableFinal[typeID] = {}
-                    for timeslot in keys:
+                    for timeslot in keys[typeID]:
+                        print(dataTable,"\n\n", timeslot, "\n\n", typeID)
                         dataTableFinal[typeID][timeslot] = dataTable[typeID][timeslot]
                         directionKeys = sorted(dataTableFinal[typeID][timeslot])
                         dataTableFinal[typeID][timeslot] = {x:dataTableFinal[typeID][timeslot][x] for x in directionKeys}
