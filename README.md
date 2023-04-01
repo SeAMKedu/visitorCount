@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7777451.svg)](https://doi.org/10.5281/zenodo.7777451)
+
 ![Älykkäät teknologiat](https://storage.googleapis.com/seamk-production/2022/04/2b1d63e0-alykkaat-teknologiat_highres_2022-768x336.jpg)
 ![ESR](https://storage.googleapis.com/seamk-production/2022/02/da4e4541-eu-lippu-290x300.png) ![Vipuvoimaa](https://storage.googleapis.com/seamk-production/2022/02/8d432b35-vipuvoimaa-eulta-logo-300x212.png) ![ELY-keskus](https://storage.googleapis.com/seamk-production/2021/08/5e942eac-ely-keskus_logo-300x105.png) ![SeAMK](https://storage.googleapis.com/seamk-production/2022/02/79a4ce1b-seamk_vaaka_fi_en_rgb_1200x486-300x122.jpg)
 # Kävijäseuranta ja raportointi
@@ -9,6 +11,7 @@ Merkittävät muutokset julkaisuun
 |---|---|---|
 |15.2.2023|1. julkaisu|Tommi Ylimäki|
 |13.3.2023|Mosquitto ja systemctl|Tommi Ylimäki|
+|28.3.2023|julkaisu SeAMKedussa|Tommi Ylimäki|
 # Sisällysluettelo
 - [Julkaisun nimi](#julkaisun-nimi)
 - [Julkaisun historiatiedot](#julkaisun-historiatiedot)
@@ -24,6 +27,7 @@ Merkittävät muutokset julkaisuun
 - [Tulokset](#tulokset)
 - [Lisenssi](#lisenssi)
 - [Tekijät](#tekijät)
+- 
 
 # Teknologiapilotti
 TehoData-hankkeen pilotissa 10 pyrittiin luomaan edullinen kävijälaskuri pienille matkailualan yrityksille Etelä-Pohjanmaalla. Julkaisu löytyy osoitteesta [https://lehti.seamk.fi/alykkaat-ja-energiatehokkaat-jarjestelmat/tekoaly-tuo-tarkkuutta-matkailuyrityksen-kavijadataan/](https://lehti.seamk.fi/alykkaat-ja-energiatehokkaat-jarjestelmat/tekoaly-tuo-tarkkuutta-matkailuyrityksen-kavijadataan/).
@@ -38,8 +42,8 @@ TehoDatan hankesivut löytyvät osoitteesta [https://projektit.seamk.fi/alykkaat
 # Tavoitteet
 Pilotissa kehitettiin edullista, avoimen lähdekoodin kuvantunnistusalgoritmien toimintaan perustuvaa kävijälaskuria.
 # Toimenpiteet
-Sovelluskokonaisuuden toimintaa on testattu pilottiyrityksessä kesällä 2023, minkä pohjalta määriteltiin jatkokehitystarpeet:
--sovellus on saatava toimimaan nopeammin (esimerkiksi Raspberry Pi 4:llä tai ainakin Jetson Nanolla)
+Sovelluskokonaisuuden toimintaa on testattu pilottiyrityksessä loppukesästä 2022, minkä pohjalta määriteltiin jatkokehitystarpeet:
+-sovellus on saatava toimimaan nopeammin (tavoitteena sujuvuus Raspberry Pi 4:llä tai ainakin Jetson Nanolla)
 -sovellukseen vaihdettiin paremmin toimiva kohteenseuranta-algoritmi
 -sovellus on pilkottiin modulaarisiin osiin, jotta esimerkiksi tulo- ja lähtötapahtumien tunnistamiseen käytetty teknologia voidaan haluttaessa vaihtaa
 
@@ -51,7 +55,8 @@ Sovellus käyttää suojaamatonta yhteyttä MQTT brokerin ja skriptien ja toisaa
 Sovellus ei talleta kuvia tai videota, mutta se mahdollistaa kerran sekunnissa päivittyvän live-kuvan seuraamisen web-käyttöliittymän kautta. Tätä käyttöliittymää ei ole tarkoitus käyttää kuin asennusvaiheessa kameran oikean suuntaamisen varmistamiseksi.
 ## Kävijälaskurin toiminta
 Kävijälaskurin toiminta perustuu modulaariseen sovellusrakenteeseen, joka koostuu viidestä päämoduulista:
-- Tunnistusmoduuli [vehicle_count.py](vehicle_count.py)
+- Tunnistusmoduuli [yoloCount.py](yoloCount.py) 
+- edelliselle vaihtoehtoinen kasvojen tunnistamiseen pohjautuva [faceCount.py](faceCount.py)
 - Dataa levylle tallettava [listener.py](listener.py)
 - Tilastot muotoileva [parse_stats.py](parse_stats.py)
 - Raportit sähköpostiin lähettävä [emailing.py](emailing.py)
@@ -65,7 +70,7 @@ Näiden lisäksi on apumoduuleja, joihin on pakattu tarvittavia funktioita ja lu
 - OpenCV piirtofunktiot kameran ottamille kuville suorittava [drawing_functions.py](drawing_functions.py)
 
 ## Tunnistusmoduuli vehicle_count.py
-Vehicle_count.py nojaa OpenCV-kirjaston Darknet-neuroverkkoalustalle rakennettuun, valmiiksi koulutettuun [YoloV4-verkkoon](https://paperswithcode.com/method/yolov4), GitHubissa [https://github.com/pjreddie/darknet](https://github.com/pjreddie/darknet). Kehittelyn pohjaksi otettiin [TechVidvanin](https://techvidvan.com/tutorials/opencv-vehicle-detection-classification-counting/) mallikoodi. Skripti alustaa neuroverkon valmiilla YOLOv4-lite (tai raskaammalla YOLOv4) koulutustiedostolla [https://github.com/AlexeyAB/darknet/tree/master/cfg](https://github.com/AlexeyAB/darknet/tree/master/cfg), joka tunnistaa COCO-aineiston 80 erilaista objektia. Tämän pilotin kannalta oleellisia ovat ihmiset, mutta skriptiin on helppo valita haluamansa seurattavat objektit mukauttamalla asetustiedoston `required_classes`-listaa.
+yoloCount.py nojaa OpenCV-kirjaston Darknet-neuroverkkoalustalle rakennettuun, valmiiksi koulutettuun [YoloV4-verkkoon](https://paperswithcode.com/method/yolov4), GitHubissa [https://github.com/pjreddie/darknet](https://github.com/pjreddie/darknet). Kehittelyn pohjaksi otettiin [TechVidvanin](https://techvidvan.com/tutorials/opencv-vehicle-detection-classification-counting/) mallikoodi. Skripti alustaa neuroverkon valmiilla YOLOv4-lite (tai raskaammalla YOLOv4) koulutustiedostolla [https://github.com/AlexeyAB/darknet/tree/master/cfg](https://github.com/AlexeyAB/darknet/tree/master/cfg), joka tunnistaa COCO-aineiston 80 erilaista objektia. Tämän pilotin kannalta oleellisia ovat ihmiset, mutta skriptiin on helppo valita haluamansa seurattavat objektit mukauttamalla asetustiedoston `required_classes`-listaa.
 
 Skriptissä on kirjoitushetkellä sisäänrakennettuna mahdollisuus sekä paikallisen käyttöjärjestelmän ikkunaan että web-palvelimelle käyttöliittymän tuottavaan ajoon (boolean-muuttujat `setup_local_screen` ja `web_screen`). Nämä eivät kuitenkaan ole pakollisia itse toiminnan kannalta. Video-kuvaa voi välittää myös MQTT-brokerille `/pic` aihekanavalle asetustiedoston `setupMqttVideo` boolean-muuttujan avulla, joskin etenkin pilvessä toimivat maksuttomat MQTT-brokerit eivät yleensä salli merkittävien data-määrien siirtämistä pitkää aikaa. Paikallisella MQTT-brokerilla kuten [Mosquitto](https://mosquitto.org/) ongelma on pienempi.
 
