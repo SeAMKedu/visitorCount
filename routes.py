@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response, send_from_directory, send_file
+from flask import Flask, render_template, Response, send_from_directory, send_file, request
 import threading
 import configparser
 import time

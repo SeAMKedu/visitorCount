@@ -1,6 +1,6 @@
 [debug]
 # log different messages to disk (applies all started .py processes)
-debugLogging = True
+debugLogging = False
 
 [main]
 # counter lines
@@ -11,9 +11,8 @@ line_difference = 0.125
 camera_rotate = 0
 # native resolution of camera
 resolution = (1280,720)
-# True crops camera picture into square form
-crop_square = False
-
+# Camera picture cropping. -1 = no crop, 0 = maximum square crop, other values = pixel size of crop. eg 300 => crop 300$
+crop_square = 416
 # local CV2 window to show video stream 
 setup_local_screen = False
 # which camera to use (0 is the first attached camera, eg. integrated web camera or first usb camera)
