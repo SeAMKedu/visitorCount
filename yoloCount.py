@@ -27,7 +27,7 @@ save_detection_frames = config.getboolean('main','save_detection_frames')
 camera_number = config.getint('main', 'camera_number')
 camera_rotate_set = config.getint('main', 'camera_rotate')
 resolution = eval(config.get('main', 'resolution'))
-crop_square = config.getboolean('main', 'crop_square')
+crop_square = config.getint('main', 'crop_square')
 model_tiny = config.getboolean('main', "model_tiny") # False uses yolov4, True yolov4-tiny network
 confThreshold = config.getfloat('main', 'confThreshold')
 nmsThreshold = config.getfloat('main', 'nmsThreshold')
@@ -67,15 +67,19 @@ font_color = (255, 255, 255)
 font_size = 0.4
 font_thickness = 1
 
-if crop_square:
+if crop_square == 0:
     length = min(resolution)
+    crop_coord = [int(resolution[0]/2 - length/2), int(resolution[1]/2 - length/2), int(resolution[0]/2 + length/2), int(resolution[1]/2 + length/2)]
+    resolution = (length, length)
+elif crop_square > 0:
+    length = crop_square
     crop_coord = [int(resolution[0]/2 - length/2), int(resolution[1]/2 - length/2), int(resolution[0]/2 + length/2), int(resolution[1]/2 + length/2)]
     resolution = (length, length)
 else:
     crop_coord=[0,0,resolution[0],resolution[1]]
 aspectRatio = (crop_coord[2]-crop_coord[0])/(crop_coord[3]-crop_coord[1])
 middle_line_position, up_line_position, up_line_out_position, down_line_position, down_line_out_position = calculate_line_positions(middle_line, line_difference, resolution, direction)
-print(crop_coord, aspectRatio)
+print("defined cropping coordinates and aspect ratio:",crop_coord, aspectRatio)
 
 # Store Coco Names in a list
 print('Folder: '+folder+"coco.names")
