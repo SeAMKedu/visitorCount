@@ -139,8 +139,8 @@ def count_vehicle2(tracks, img):
         else:
             control_coord = iy
         # Find the current position of the object and determine if it has crossed the control line to some direction.
-        print("ylälistalla henkilöitä:", len(temp_up_list), end=", ")
-        print("alalistalla henkilöitä:", len(temp_down_list))
+        #print("ylälistalla henkilöitä:", len(temp_up_list), end=", ")
+        #print("alalistalla henkilöitä:", len(temp_down_list))
         if control_coord < middle_line_position:
             if id not in temp_up_list:
                 temp_up_list.append(id)
