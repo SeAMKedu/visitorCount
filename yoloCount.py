@@ -139,6 +139,8 @@ def count_vehicle2(tracks, img):
         else:
             control_coord = iy
         # Find the current position of the object and determine if it has crossed the control line to some direction.
+        print("ylälistalla henkilöitä:", len(temp_up_list), end=", ")
+        print("alalistalla henkilöitä:", len(temp_down_list))
         if control_coord < middle_line_position:
             if id not in temp_up_list:
                 temp_up_list.append(id)
@@ -150,15 +152,17 @@ def count_vehicle2(tracks, img):
         if control_coord < up_line_out_position:
             if id in temp_down_list:
                 temp_down_list.remove(id)
+                print("alhaalta ylös")
                 mqttSender.sendMessage(f"{mqttClient}/{down_direction}/{up_direction}/{classNames[required_class_index[index]]}", str(datetime.datetime.now()), qos = 2)
 
         elif control_coord > down_line_out_position:
             if id in temp_up_list:
                 temp_up_list.remove(id)
+                print("ylhäältä alas")
                 mqttSender.sendMessage(f"{mqttClient}/{up_direction}/{down_direction}/{classNames[required_class_index[index]]}", str(datetime.datetime.now()), qos = 2)
         activeIDs.append(id)
-        temp_up_list = [id for id in temp_up_list if id in activeIDs] # let's clean unused IDs from temp lists
-        temp_down_list = [id for id in temp_down_list if id in activeIDs]
+    temp_up_list = [id for id in temp_up_list if id in activeIDs] # let's clean unused IDs from temp lists
+    temp_down_list = [id for id in temp_down_list if id in activeIDs]
         
     mqttSender.sendMessage(f"stats/tempUpList", str([id[:6] for id in temp_up_list]), qos = 0, printOut = False, log = False)
     mqttSender.sendMessage(f"stats/tempDownList", str([id[:6] for id in temp_down_list]), qos = 0, printOut = False, log = False)
