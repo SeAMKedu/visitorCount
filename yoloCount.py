@@ -3,7 +3,6 @@ import base64
 from mqtt_class import mqttClass
 from drawing_functions import *
 from disk_functions import *
-import cv2, os
 import numpy as np
 import datetime
 import time
@@ -18,6 +17,9 @@ from motpy import Detection, MultiObjectTracker
 from motpy.testing_viz import draw_detection, draw_track
 
 folder = os.getcwd()+'/'
+
+global model_spec, matching_fn_kwargs, active_tracks_kwargs, tracker_kwargs, confThreshold, nmsThreshold, tracker2
+
 config = ConfigParser()
 config_file = 'configuration.ini'
 config.read(config_file)
@@ -49,12 +51,16 @@ direction = config.get('main', 'direction')
 middle_line = config.getfloat('main', 'middle_line')
 line_difference = config.getfloat('main', 'line_difference')
 
+
 model_spec = eval(config.get('main', 'model_spec'))
 matching_fn_kwargs = eval(config.get('main', 'matching_fn_kwargs'))
 active_tracks_kwargs = eval(config.get('main', 'active_tracks_kwargs'))
 tracker_kwargs = eval(config.get('main', 'tracker_kwargs'))
 dt = 1 / config.getint('main', 'FPSforDt')
+
 tracker2 = MultiObjectTracker(dt=dt, model_spec=model_spec, matching_fn_kwargs = matching_fn_kwargs, active_tracks_kwargs=active_tracks_kwargs, tracker_kwargs=tracker_kwargs)
+
+
 
 # Initialize the videocapture object
 camera_rotate = {"set":camera_rotate_set, 0:0, 1:cv2.ROTATE_90_CLOCKWISE, 2:cv2.ROTATE_180, 3:cv2.ROTATE_90_COUNTERCLOCKWISE}
@@ -200,11 +206,56 @@ def postProcess2(outputs, img):
 
     return detection
 
+def on_change_nms(value):
+    global nmsThreshold
+    nmsThreshold = value/100
+
+def on_change_conf(value):
+    global confThreshold
+    confThreshold = value/100
+
+def on_change_qvar(value):
+    global model_spec, tracker2
+    model_spec['q_var_pos'] = value/10
+    tracker2 = MultiObjectTracker(dt=dt, model_spec=model_spec, matching_fn_kwargs = matching_fn_kwargs, active_tracks_kwargs=active_tracks_kwargs, tracker_kwargs=tracker_kwargs)
+    print('q_var_pos =', value/10)
+def on_change_rvar(value):
+    global model_spec
+    model_spec['r_var_pos'] = value/1000
+    tracker2 = MultiObjectTracker(dt=dt, model_spec=model_spec, matching_fn_kwargs = matching_fn_kwargs, active_tracks_kwargs=active_tracks_kwargs, tracker_kwargs=tracker_kwargs)
+    print('r_var_pos =', value/1000)
+
+def on_change_miniou(value):
+    global matching_fn_kwargs, tracker2
+    matching_fn_kwargs['min_iou'] = value/100
+    tracker2 = MultiObjectTracker(dt=dt, model_spec=model_spec, matching_fn_kwargs = matching_fn_kwargs, active_tracks_kwargs=active_tracks_kwargs, tracker_kwargs=tracker_kwargs)
+    print('min_iou =', value/100)
+
+def on_change_multiminiou(value):
+    global matching_fn_kwargs, tracker2
+    matching_fn_kwargs['multi_match_min_iou'] = value/100
+    tracker2 = MultiObjectTracker(dt=dt, model_spec=model_spec, matching_fn_kwargs = matching_fn_kwargs, active_tracks_kwargs=active_tracks_kwargs, tracker_kwargs=tracker_kwargs)
+    print('multi_match_min_iou =', value/100)
+    
+def on_change_minsteps(value):
+    global active_tracks_kwargs, tracker2
+    active_tracks_kwargs['min_steps_alive'] = value
+    tracker2 = MultiObjectTracker(dt=dt, model_spec=model_spec, matching_fn_kwargs = matching_fn_kwargs, active_tracks_kwargs=active_tracks_kwargs, tracker_kwargs=tracker_kwargs)
+
+def on_change_maxstale(value):
+    global active_tracks_kwargs, tracker_kwargs, tracker2
+    active_tracks_kwargs['max_staleness'] = value
+    tracker_kwargs['max_staleness'] = value
+    tracker2 = MultiObjectTracker(dt=dt, model_spec=model_spec, matching_fn_kwargs = matching_fn_kwargs, active_tracks_kwargs=active_tracks_kwargs, tracker_kwargs=tracker_kwargs)
+
+
 def realTime():
     #try:
     mqttVideoTime = time.time()
     i = 0
     if publish_stats: publishStatsGenerator = publishStats(mqttSender)
+    if setup_local_screen: # if local screen is to be opened, we must initialize it when window is opened for first time.
+        init_local_screen = True
 
     while True:
         success, img = cap.read()
@@ -259,6 +310,18 @@ def realTime():
         # if local screen is to be shown
         if setup_local_screen:
             action = localOutput(cv2, img, font_size, font_color, font_thickness)
+            if init_local_screen:
+                cv2.imshow('Trackbars',np.zeros((100,500,3), dtype=np.uint8))
+                cv2.createTrackbar('confThreshold', 'Trackbars', int(confThreshold*100) ,100, on_change_conf)
+                cv2.createTrackbar('nmsThreshold', 'Trackbars', int(nmsThreshold*100) ,100, on_change_nms)
+                cv2.createTrackbar('q_var_pos', 'Trackbars', int(model_spec['q_var_pos']*10),200000, on_change_qvar)
+                cv2.createTrackbar('r_var_pos', 'Trackbars', int(model_spec['r_var_pos']*1000),10000, on_change_rvar)
+                cv2.createTrackbar('min_iou', 'Trackbars', int(matching_fn_kwargs['min_iou']*100),100, on_change_miniou)
+                cv2.createTrackbar('multi_match_min_iou', 'Trackbars', int(matching_fn_kwargs['multi_match_min_iou']*100),100, on_change_multiminiou)
+                cv2.createTrackbar('min_steps_alive', 'Trackbars', int(active_tracks_kwargs['min_steps_alive']),20, on_change_minsteps)
+                cv2.createTrackbar('max_staleness', 'Trackbars', int(tracker_kwargs['max_staleness']),30, on_change_maxstale)
+                init_local_screen = False
+
             if action == 1:
                 #write_raw_csv() deprecated with MQTT   
                 break # stop program
