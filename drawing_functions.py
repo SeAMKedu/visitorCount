@@ -73,7 +73,8 @@ def publishStats(mqttSender):
             i = 0
         yield
         
-def drawStats(cv2, img, classNames, required_class_index, up_direction, down_direction, up_list, down_list, time1, font_size, font_color, font_thickness):
+def drawStats(cv2, img, classNames, required_class_index, up_direction, down_direction, up_list, down_list, time1, font_size, font_color, font_thickness, conf = 0, nms = 0, q_var_pos = 0, r_var_pos = 0, min_iou = 0, multi_match_min_iou = 0, min_steps_alive = 0, max_staleness = 0):
+    
     time2 = time.time()
     diff = time2 - time1
     fps = round(1 / diff,1)
@@ -81,19 +82,23 @@ def drawStats(cv2, img, classNames, required_class_index, up_direction, down_dir
     # Draw black non-opaque box beyond white text
     x1,y1 = calc_coord(0.02, 0.01, img.shape)
     x2,y2 = calc_coord(0.4, 0.01, img.shape)
-    y2 += 20*len(up_list) + 50
+    y2 += 18*len(up_list) + 50
     sub_img = img[y1:y2, x1:x2]
     black_rect = np.ones(sub_img.shape, dtype=np.uint8) * 0
     res = cv2.addWeighted(sub_img, 0.5, black_rect, 0.5, 1.0)
     img[y1:y2, x1:x2] = res
 
-    cv2.putText(img, up_direction + " " + down_direction, calc_coord(0.2,0.02,img.shape), cv2.FONT_HERSHEY_SIMPLEX, font_size, font_color, font_thickness)
+    cv2.putText(img, f"FPS: {fps}", calc_coord(0.05,0.025,img.shape), cv2.FONT_HERSHEY_SIMPLEX, font_size, font_color, font_thickness)
+    cv2.putText(img, up_direction + " " + down_direction, calc_coord(0.2,0.025,img.shape), cv2.FONT_HERSHEY_SIMPLEX, font_size, font_color, font_thickness)
     for index in range(len(up_list)):
-        cv2.putText(img, f"{classNames[required_class_index[index]]:<14}", tuple(a+b for a,b in zip(calc_coord(0.05, 0.03, img.shape),(0,20*index))), cv2.FONT_HERSHEY_SIMPLEX, font_size, font_color, font_thickness)
-        cv2.putText(img, str(up_list[index]), tuple(a+b for a,b in zip(calc_coord(0.2, 0.03, img.shape),(0,20*index))), cv2.FONT_HERSHEY_SIMPLEX, font_size, font_color, font_thickness)
+        cv2.putText(img, f"{classNames[required_class_index[index]]:<14}", tuple(a+b for a,b in zip(calc_coord(0.05, 0.04, img.shape),(0,20*index))), cv2.FONT_HERSHEY_SIMPLEX, font_size, font_color, font_thickness)
+        cv2.putText(img, str(up_list[index]), tuple(a+b for a,b in zip(calc_coord(0.2, 0.045, img.shape),(0,18*index))), cv2.FONT_HERSHEY_SIMPLEX, font_size, font_color, font_thickness)
     for index in range(len(down_list)):
-        cv2.putText(img, str(down_list[index]), tuple(a+b for a,b in zip(calc_coord(0.25, 0.03, img.shape),(0,20*index))), cv2.FONT_HERSHEY_SIMPLEX, font_size, font_color, font_thickness)
-    cv2.putText(img, f"FPS: {fps}", calc_coord(0.05,0.02,img.shape), cv2.FONT_HERSHEY_SIMPLEX, font_size, font_color, font_thickness)
+        cv2.putText(img, str(down_list[index]), tuple(a+b for a,b in zip(calc_coord(0.25, 0.045, img.shape),(0,18*index))), cv2.FONT_HERSHEY_SIMPLEX, font_size, font_color, font_thickness)
+    
+    if conf and nms and q_var_pos and r_var_pos and min_iou and multi_match_min_iou and min_steps_alive and max_staleness:
+        cv2.putText(img, f"confidence:{conf}, nms:{nms}, q_var:{q_var_pos}, r_var:{r_var_pos}", tuple(a+b for a,b in zip(calc_coord(0.05, 0.075, img.shape),(0,18*index))), cv2.FONT_HERSHEY_SIMPLEX, font_size, font_color, font_thickness)
+        cv2.putText(img, f"min_iou:{min_iou}, multi_min_iou:{multi_match_min_iou}, min_steps:{min_steps_alive}, max_stale:{max_staleness}", tuple(a+b for a,b in zip(calc_coord(0.05, 0.095, img.shape),(0,18*index))), cv2.FONT_HERSHEY_SIMPLEX, font_size, font_color, font_thickness)
     return time.time()
 
 def calculate_line_positions(middle, diff, resolution, direction):

@@ -158,13 +158,11 @@ def count_vehicle2(tracks, img):
         if control_coord < up_line_out_position:
             if id in temp_down_list:
                 temp_down_list.remove(id)
-                print("alhaalta ylös")
                 mqttSender.sendMessage(f"{mqttClient}/{down_direction}/{up_direction}/{classNames[required_class_index[index]]}", str(datetime.datetime.now()), qos = 2)
 
         elif control_coord > down_line_out_position:
             if id in temp_up_list:
                 temp_up_list.remove(id)
-                print("ylhäältä alas")
                 mqttSender.sendMessage(f"{mqttClient}/{up_direction}/{down_direction}/{classNames[required_class_index[index]]}", str(datetime.datetime.now()), qos = 2)
         activeIDs.append(id)
     temp_up_list = [id for id in temp_up_list if id in activeIDs] # let's clean unused IDs from temp lists
@@ -252,10 +250,14 @@ def on_change_maxstale(value):
 def realTime():
     #try:
     mqttVideoTime = time.time()
-    i = 0
     if publish_stats: publishStatsGenerator = publishStats(mqttSender)
     if setup_local_screen: # if local screen is to be opened, we must initialize it when window is opened for first time.
         init_local_screen = True
+    if save_detection_frames:
+        i = 0
+        saving = False
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        savingStartTime = time.time()
 
     while True:
         success, img = cap.read()
@@ -277,8 +279,25 @@ def realTime():
         # Find the objects from the network output
         detections = postProcess2(outputs, img)
         tracker2.step(detections)
-        tracks = tracker2.active_tracks(min_steps_alive=5)
-        
+        tracks = tracker2.active_tracks()
+
+        if save_detection_frames:
+            if len(tracks) > 0: # if active tracks exist
+                detectionVideoStartTime = time.time() # reset timer
+                if not saving: # if not currently collecting frames for video file, instantiate new videowriter object
+                    i += 1
+                    outputFile = cv2.VideoWriter(f"saves/{i}output.avi", fourcc, 1/dt, resolution)
+                    saving = True
+                    savingStartTime = time.time()
+            if saving: 
+                outputFile.write(img) # write current frame to video file
+                cv2.circle(img,(crop_coord[0]+40, crop_coord[1]+40), 20, (255*(i%2),20*(i%2)+200*((i+1)%2),50*((i+1)%2)), -1)
+            if (saving and time.time() - detectionVideoStartTime > 5) or time.time() - savingStartTime > 30:
+                # if saving but enough time has passed and there is no active tracks, close video file
+                outputFile.release()
+                saving = False
+            
+
         # preview the boxes on frame
         for det in detections:
             draw_detection(img, det)
@@ -288,7 +307,6 @@ def realTime():
         # Draw tracers
         #if tracers:
             #pass #not implemented
-
 
         # Draw the crossing lines
         if lines: drawLines(cv2, up_line_position, up_line_out_position, middle_line_position, down_line_out_position, down_line_position, img, direction)
@@ -302,11 +320,6 @@ def realTime():
         if publish_stats : 
             next(publishStatsGenerator)
             
-        if save_detection_frames:
-            pass #not implemented
-            #if detected:
-            #    cv2.imwrite(folder+'detections/'+str(datetime.datetime.now())+'.jpg', img)
-
         # if local screen is to be shown
         if setup_local_screen:
             action = localOutput(cv2, img, font_size, font_color, font_thickness)
