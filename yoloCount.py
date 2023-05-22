@@ -158,12 +158,12 @@ def count_vehicle2(tracks, img):
         if control_coord < up_line_out_position:
             if id in temp_down_list:
                 temp_down_list.remove(id)
-                mqttSender.sendMessage(f"{mqttClient}/{down_direction}/{up_direction}/{classNames[required_class_index[index]]}", str(datetime.datetime.now()), qos = 2)
+                mqttSender.sendMessage(f"{mqttClient}/{down_direction}/{up_direction}/{classNames[index]}", str(datetime.datetime.now()), qos = 2)
 
         elif control_coord > down_line_out_position:
             if id in temp_up_list:
                 temp_up_list.remove(id)
-                mqttSender.sendMessage(f"{mqttClient}/{up_direction}/{down_direction}/{classNames[required_class_index[index]]}", str(datetime.datetime.now()), qos = 2)
+                mqttSender.sendMessage(f"{mqttClient}/{up_direction}/{down_direction}/{classNames[index]}", str(datetime.datetime.now()), qos = 2)
         activeIDs.append(id)
     temp_up_list = [id for id in temp_up_list if id in activeIDs] # let's clean unused IDs from temp lists
     temp_down_list = [id for id in temp_down_list if id in activeIDs]
@@ -246,118 +246,129 @@ def on_change_maxstale(value):
     tracker_kwargs['max_staleness'] = value
     tracker2 = MultiObjectTracker(dt=dt, model_spec=model_spec, matching_fn_kwargs = matching_fn_kwargs, active_tracks_kwargs=active_tracks_kwargs, tracker_kwargs=tracker_kwargs)
 
+def on_change_line(value):
+    global middle_line_position, up_line_position, up_line_out_position, down_line_position, down_line_out_position
+    middle_line = value/100
+    middle_line_position, up_line_position, up_line_out_position, down_line_position, down_line_out_position = calculate_line_positions(middle_line, line_difference, resolution, direction)
+
+
 
 def realTime():
-    #try:
-    mqttVideoTime = time.time()
-    if publish_stats: publishStatsGenerator = publishStats(mqttSender)
-    if setup_local_screen: # if local screen is to be opened, we must initialize it when window is opened for first time.
-        init_local_screen = True
-    if save_detection_frames:
-        i = 0
-        saving = False
-        fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        savingStartTime = time.time()
-
-    while True:
-        success, img = cap.read()
-        img = img[crop_coord[1]:crop_coord[3], crop_coord[0]:crop_coord[2]]
-        if camera_rotate["set"] != 0:
-            img = cv2.rotate(img, camera_rotate[camera_rotate["set"]])
-        blob = cv2.dnn.blobFromImage(img, 1 / 255, (input_size, input_size), [0, 0, 0], 1, crop=False)
-        
-        # Set the input of the network
-        net.setInput(blob)
-
-        # Find out the unconnected (ie. output) layers of the network
-        layersNames = net.getLayerNames()
-        outputNames = [(layersNames[i - 1]) for i in net.getUnconnectedOutLayers()]
-        
-        # Feed data to the network
-        outputs = net.forward(outputNames)
-    
-        # Find the objects from the network output
-        detections = postProcess2(outputs, img)
-        tracker2.step(detections)
-        tracks = tracker2.active_tracks()
-
+    try:
+        mqttVideoTime = time.time()
+        if publish_stats: publishStatsGenerator = publishStats(mqttSender)
+        if setup_local_screen: # if local screen is to be opened, we must initialize it when window is opened for first time.
+            init_local_screen = True
         if save_detection_frames:
-            if len(tracks) > 0: # if active tracks exist
-                detectionVideoStartTime = time.time() # reset timer
-                if not saving: # if not currently collecting frames for video file, instantiate new videowriter object
-                    i += 1
-                    outputFile = cv2.VideoWriter(f"saves/{i}output.avi", fourcc, 1/dt, resolution)
-                    saving = True
-                    savingStartTime = time.time()
-            if saving: 
-                outputFile.write(img) # write current frame to video file
-                cv2.circle(img,(crop_coord[0]+40, crop_coord[1]+40), 20, (255*(i%2),20*(i%2)+200*((i+1)%2),50*((i+1)%2)), -1)
-            if (saving and time.time() - detectionVideoStartTime > 5) or time.time() - savingStartTime > 30:
-                # if saving but enough time has passed and there is no active tracks, close video file
-                outputFile.release()
-                saving = False
+            i = 0
+            saving = False
+            fourcc = cv2.VideoWriter_fourcc(*'XVID')
+            savingStartTime = time.time()
+
+        while True:
+            success, img = cap.read()
+            img = img[crop_coord[1]:crop_coord[3], crop_coord[0]:crop_coord[2]]
+            if camera_rotate["set"] != 0:
+                img = cv2.rotate(img, camera_rotate[camera_rotate["set"]])
+            blob = cv2.dnn.blobFromImage(img, 1 / 255, (input_size, input_size), [0, 0, 0], 1, crop=False)
             
+            # Set the input of the network
+            net.setInput(blob)
 
-        # preview the boxes on frame
-        for det in detections:
-            draw_detection(img, det)
-        
-        count_vehicle2(tracks, img) # check possible events and draw tracks
-
-        # Draw tracers
-        #if tracers:
-            #pass #not implemented
-
-        # Draw the crossing lines
-        if lines: drawLines(cv2, up_line_position, up_line_out_position, middle_line_position, down_line_out_position, down_line_position, img, direction)
-
-        # Draw area name texts in the frame
-        drawNames(cv2, img, up_direction, down_direction, direction, font_size, font_color, font_thickness)
-        
-        # Draw counting stats in the frame
-        #if show_stats: 
-        #    time1 = drawStats(cv2, img, classNames, required_class_index, up_direction, down_direction, up_list, down_list, time1, font_size, font_color, font_thickness)
-        if publish_stats : 
-            next(publishStatsGenerator)
+            # Find out the unconnected (ie. output) layers of the network
+            layersNames = net.getLayerNames()
+            outputNames = [(layersNames[i - 1]) for i in net.getUnconnectedOutLayers()]
             
-        # if local screen is to be shown
-        if setup_local_screen:
-            action = localOutput(cv2, img, font_size, font_color, font_thickness)
-            if init_local_screen:
-                cv2.imshow('Trackbars',np.zeros((100,500,3), dtype=np.uint8))
-                cv2.createTrackbar('confThreshold', 'Trackbars', int(confThreshold*100) ,100, on_change_conf)
-                cv2.createTrackbar('nmsThreshold', 'Trackbars', int(nmsThreshold*100) ,100, on_change_nms)
-                cv2.createTrackbar('q_var_pos', 'Trackbars', int(model_spec['q_var_pos']*10),200000, on_change_qvar)
-                cv2.createTrackbar('r_var_pos', 'Trackbars', int(model_spec['r_var_pos']*1000),10000, on_change_rvar)
-                cv2.createTrackbar('min_iou', 'Trackbars', int(matching_fn_kwargs['min_iou']*100),100, on_change_miniou)
-                cv2.createTrackbar('multi_match_min_iou', 'Trackbars', int(matching_fn_kwargs['multi_match_min_iou']*100),100, on_change_multiminiou)
-                cv2.createTrackbar('min_steps_alive', 'Trackbars', int(active_tracks_kwargs['min_steps_alive']),20, on_change_minsteps)
-                cv2.createTrackbar('max_staleness', 'Trackbars', int(tracker_kwargs['max_staleness']),30, on_change_maxstale)
-                init_local_screen = False
+            # Feed data to the network
+            outputs = net.forward(outputNames)
+        
+            # Find the objects from the network output
+            detections = postProcess2(outputs, img)
+            tracker2.step(detections)
+            tracks = tracker2.active_tracks()
 
-            if action == 1:
-                #write_raw_csv() deprecated with MQTT   
-                break # stop program
-            elif action == 2:
-                #write_raw_csv() deprecated with MQTT
+            if save_detection_frames:
+                if len(tracks) > 0: # if active tracks exist
+                    detectionVideoStartTime = time.time() # reset timer
+                    if not saving: # if not currently collecting frames for video file, instantiate new videowriter object
+                        i += 1
+                        outputFile = cv2.VideoWriter(f"saves/{i}-{datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d-%H_%M')}-output.avi", fourcc, 1/dt, resolution)
+                        saving = True
+                        savingStartTime = time.time()
+                if saving: 
+                    outputFile.write(img) # write current frame to video file
+                    cv2.circle(img,(crop_coord[0]+40, crop_coord[1]+40), 20, (255*(i%2),20*(i%2)+200*((i+1)%2),50*((i+1)%2)), -1)
+                if (saving and time.time() - detectionVideoStartTime > 5) or time.time() - savingStartTime > 30:
+                    # if saving but time limit has passed and there is no active tracks, close video file
+                    # if given maximum time span has passed, close video file anyway to keep file size low.
+                    outputFile.release()
+                    saving = False
+                
+
+            # preview the boxes on frame
+            for det in detections:
+                draw_detection(img, det)
+            
+            count_vehicle2(tracks, img) # check possible events and draw tracks
+
+            # Draw tracers
+            #if tracers:
+                #pass #not implemented
+
+            # Draw the crossing lines
+            if lines: drawLines(cv2, up_line_position, up_line_out_position, middle_line_position, down_line_out_position, down_line_position, img, direction)
+
+            # Draw area name texts in the frame
+            drawNames(cv2, img, up_direction, down_direction, direction, font_size, font_color, font_thickness)
+            
+            # Draw counting stats in the frame
+    
+            if show_stats: 
+                #time1 = drawStats(cv2, img, classNames, required_class_index, up_direction, down_direction, up_list, down_list, time1, font_size, font_color, font_thickness, confThreshold, nmsThreshold, model_spec['q_var_pos'], model_spec['r_var_pos'], matching_fn_kwargs['min_iou'], matching_fn_kwargs['multi_match_min_iou'], active_tracks_kwargs['min_steps_alive'], active_tracks_kwargs['max_staleness'])
                 pass
 
-        # Convert (encode) image  into streaming data and store it in-memory cache. It is used to compress image data formats in order to make network transfer easier.
-        if setupMqttVideo:
-            
-            if time.time() - mqttVideoTime > mqttVideoInterval:
-                img2 = cv2.resize(img, (mqttVideoResolution, int(mqttVideoResolution/aspectRatio)))
-                ret, buffer = cv2.imencode('.jpg', img2, [1, 60])
-                if setupMqttVideo:
-                    img2 = base64.encodebytes(buffer)
-                    mqttSender.sendMessage("pic", img2, qos = 0, printOut=False, log = False)
-                mqttVideoTime = time.time() 
+            if publish_stats : 
+                next(publishStatsGenerator)
+                
+            # if local screen is to be shown
+            if setup_local_screen:
+                action = localOutput(cv2, img, font_size, font_color, font_thickness)
+                if init_local_screen:
+                    cv2.imshow('Trackbars',np.zeros((100,500,3), dtype=np.uint8))
+                    cv2.createTrackbar('confThreshold', 'Trackbars', int(confThreshold*100) ,100, on_change_conf)
+                    cv2.createTrackbar('nmsThreshold', 'Trackbars', int(nmsThreshold*100) ,100, on_change_nms)
+                    cv2.createTrackbar('q_var_pos', 'Trackbars', int(model_spec['q_var_pos']*10),200000, on_change_qvar)
+                    cv2.createTrackbar('r_var_pos', 'Trackbars', int(model_spec['r_var_pos']*1000),10000, on_change_rvar)
+                    cv2.createTrackbar('min_iou', 'Trackbars', int(matching_fn_kwargs['min_iou']*100),100, on_change_miniou)
+                    cv2.createTrackbar('multi_match_min_iou', 'Trackbars', int(matching_fn_kwargs['multi_match_min_iou']*100),100, on_change_multiminiou)
+                    cv2.createTrackbar('min_steps_alive', 'Trackbars', int(active_tracks_kwargs['min_steps_alive']),20, on_change_minsteps)
+                    cv2.createTrackbar('max_staleness', 'Trackbars', int(tracker_kwargs['max_staleness']),30, on_change_maxstale)
+                    cv2.createTrackbar('line', 'Trackbars', int(middle_line*100), 100, on_change_line)
+                    init_local_screen = False
 
-    # Write the vehicle counting information in a file and save it
-    """
+                if action == 1:
+                    #write_raw_csv() deprecated with MQTT   
+                    break # stop program
+                elif action == 2:
+                    #write_raw_csv() deprecated with MQTT
+                    pass
+
+            # Convert (encode) image  into streaming data and store it in-memory cache. It is used to compress image data formats in order to make network transfer easier.
+            if setupMqttVideo:
+                
+                if time.time() - mqttVideoTime > mqttVideoInterval:
+                    img2 = cv2.resize(img, (mqttVideoResolution, int(mqttVideoResolution/aspectRatio)))
+                    ret, buffer = cv2.imencode('.jpg', img2, [1, 60])
+                    if setupMqttVideo:
+                        img2 = base64.encodebytes(buffer)
+                        mqttSender.sendMessage("pic", img2, qos = 0, printOut=False, log = False)
+                    mqttVideoTime = time.time() 
+
+        # Write the vehicle counting information in a file and save it
+        
     except Exception as ex:
         print(ex)
-        write_exceptions_csv(ex, folder)
+        write_exceptions_csv(str(ex), folder)
 
     finally:    
         # realTime() # keep running
@@ -365,7 +376,7 @@ def realTime():
         mqttSender.sendMessage(f"{mqttClient}/disconnect",str(datetime.datetime.now()))
         mqttSender.client.disconnect()
         cap.release()
-        cv2.destroyAllWindows()"""
+        cv2.destroyAllWindows()
 
 def handle_sigterm(_signo, _sigframe):
     print("Vehicle count stopped by SIGTERM")

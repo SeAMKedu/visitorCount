@@ -58,7 +58,7 @@ active_tracks_kwargs = eval(config.get('main', 'active_tracks_kwargs'))
 tracker_kwargs = eval(config.get('main', 'tracker_kwargs'))
 dt = 1 / config.getint('main', 'FPSforDt')
 
-tracker2 = MultiObjectTracker(dt=dt, model_spec=model_spec, matching_fn_kwargs = matching_fn_kwargs, active_tracks_kwargs=active_tracks_kwargs, tracker_kwargs=tracker_kwargs)
+tracker2 = MultiObjectTracker(dt=1/dt, model_spec=model_spec, matching_fn_kwargs = matching_fn_kwargs, active_tracks_kwargs=active_tracks_kwargs, tracker_kwargs=tracker_kwargs)
 
 
 
@@ -217,36 +217,36 @@ def on_change_conf(value):
 def on_change_qvar(value):
     global model_spec, tracker2
     model_spec['q_var_pos'] = value/10
-    tracker2 = MultiObjectTracker(dt=dt, model_spec=model_spec, matching_fn_kwargs = matching_fn_kwargs, active_tracks_kwargs=active_tracks_kwargs, tracker_kwargs=tracker_kwargs)
+    tracker2 = MultiObjectTracker(dt=1/dt, model_spec=model_spec, matching_fn_kwargs = matching_fn_kwargs, active_tracks_kwargs=active_tracks_kwargs, tracker_kwargs=tracker_kwargs)
     print('q_var_pos =', value/10)
 def on_change_rvar(value):
     global model_spec
     model_spec['r_var_pos'] = value/1000
-    tracker2 = MultiObjectTracker(dt=dt, model_spec=model_spec, matching_fn_kwargs = matching_fn_kwargs, active_tracks_kwargs=active_tracks_kwargs, tracker_kwargs=tracker_kwargs)
+    tracker2 = MultiObjectTracker(dt=1/dt, model_spec=model_spec, matching_fn_kwargs = matching_fn_kwargs, active_tracks_kwargs=active_tracks_kwargs, tracker_kwargs=tracker_kwargs)
     print('r_var_pos =', value/1000)
 
 def on_change_miniou(value):
     global matching_fn_kwargs, tracker2
     matching_fn_kwargs['min_iou'] = value/100
-    tracker2 = MultiObjectTracker(dt=dt, model_spec=model_spec, matching_fn_kwargs = matching_fn_kwargs, active_tracks_kwargs=active_tracks_kwargs, tracker_kwargs=tracker_kwargs)
+    tracker2 = MultiObjectTracker(dt=1/dt, model_spec=model_spec, matching_fn_kwargs = matching_fn_kwargs, active_tracks_kwargs=active_tracks_kwargs, tracker_kwargs=tracker_kwargs)
     print('min_iou =', value/100)
 
 def on_change_multiminiou(value):
     global matching_fn_kwargs, tracker2
     matching_fn_kwargs['multi_match_min_iou'] = value/100
-    tracker2 = MultiObjectTracker(dt=dt, model_spec=model_spec, matching_fn_kwargs = matching_fn_kwargs, active_tracks_kwargs=active_tracks_kwargs, tracker_kwargs=tracker_kwargs)
+    tracker2 = MultiObjectTracker(dt=1/dt, model_spec=model_spec, matching_fn_kwargs = matching_fn_kwargs, active_tracks_kwargs=active_tracks_kwargs, tracker_kwargs=tracker_kwargs)
     print('multi_match_min_iou =', value/100)
     
 def on_change_minsteps(value):
     global active_tracks_kwargs, tracker2
     active_tracks_kwargs['min_steps_alive'] = value
-    tracker2 = MultiObjectTracker(dt=dt, model_spec=model_spec, matching_fn_kwargs = matching_fn_kwargs, active_tracks_kwargs=active_tracks_kwargs, tracker_kwargs=tracker_kwargs)
+    tracker2 = MultiObjectTracker(dt=1/dt, model_spec=model_spec, matching_fn_kwargs = matching_fn_kwargs, active_tracks_kwargs=active_tracks_kwargs, tracker_kwargs=tracker_kwargs)
 
 def on_change_maxstale(value):
     global active_tracks_kwargs, tracker_kwargs, tracker2
     active_tracks_kwargs['max_staleness'] = value
     tracker_kwargs['max_staleness'] = value
-    tracker2 = MultiObjectTracker(dt=dt, model_spec=model_spec, matching_fn_kwargs = matching_fn_kwargs, active_tracks_kwargs=active_tracks_kwargs, tracker_kwargs=tracker_kwargs)
+    tracker2 = MultiObjectTracker(dt=1/dt, model_spec=model_spec, matching_fn_kwargs = matching_fn_kwargs, active_tracks_kwargs=active_tracks_kwargs, tracker_kwargs=tracker_kwargs)
 
 
 def realTime():

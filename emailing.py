@@ -21,11 +21,13 @@ class emailSender():
         self.topic = topic
         self.debugLogging = debugLogging
         self.mqttListener.startListen(self.topic)
+        """ removed greeting email to avoid unneeded spamming
         if not debugLogging:
             self.htmlMessage = f"<html><body><h1>Emailing agent started</h1><p>Emailing agent for topic {self.topic} was started at {time.asctime()}</p></body></html>"
             self.textMessage = f"Emailing agent for topic {self.topic} was started at {time.asctime()}"
             self.buildEmailMessage()
             self.sendEmail() # Send greeting email to receiver to acknowledge the started reporting
+        """
 
     def onMessage2(self, client, userdata, message):
         print("\nstats message received:\n",message.payload.decode("utf-8"))
