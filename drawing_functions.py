@@ -1,6 +1,25 @@
 import numpy as np
 import time
 
+def cumulative(cv2, img, font_size, font_color, font_thickness, dir1, dir2, num1, num2):
+    """
+    defined in drawing_functions.py
+    function opens a local openCV window in operating system.
+    and prints numbers dir1 and dir2 alongside with their explanations
+    """
+    cv2.putText(img, f"{dir1}: {num1}", calc_coord(0.05, 0.3, img.shape), cv2.FONT_HERSHEY_SIMPLEX, font_size, font_color, font_thickness)
+    cv2.putText(img, f"{dir2}: {num2}", calc_coord(0.05, 0.7, img.shape), cv2.FONT_HERSHEY_SIMPLEX, font_size, font_color, font_thickness)
+
+    cv2.imshow('Cumulative', img)
+    if cv2.waitKey(5) == ord('q'):
+        return 1
+        #write_raw_csv()
+        #break
+    #if cv2.waitKey(1) == ord('w'):
+    #    return 2
+    #    #write_raw_csv()
+    
+
 def localOutput(cv2, img, font_size, font_color, font_thickness):
     """
     defined in drawing_functions.py
